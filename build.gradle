@@ -29,6 +29,7 @@ bootJar {
 
 jar {
     archiveName "${project.name}.jar"
+    archiveClassifier.set("")
 }
 
 publishing {
@@ -38,11 +39,20 @@ publishing {
             artifactId project.name
             version project.version
 
-            from components.java
-//
-//            artifact sourceJar {
-//                classifier "sources"
-//            }
+            artifact jar
+        }
+    }
+
+    repositories {
+        maven {
+            name  'reposilite'
+            url "http://${System.getenv('HOST')}/${System.getenv('REPOSITORY')}"
+            allowInsecureProtocol true
+
+            credentials {
+                username System.getenv('USERNAME')
+                password System.getenv('PASSWORD')
+            }
         }
     }
 }
