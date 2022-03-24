@@ -46,12 +46,12 @@ publishing {
     repositories {
         maven {
             name  'reposilite'
-            url "http://${System.getenv('HOST')}/${System.getenv('REPOSITORY')}"
+            url "http://${System.getenv('ARTIFACTORY_HOST')}/${System.getenv('ARTIFACTORY_REPOSITORY')}"
             allowInsecureProtocol true
 
             credentials {
-                username System.getenv('USERNAME')
-                password System.getenv('PASSWORD')
+                username System.getenv('ARTIFACTORY_USERNAME')
+                password System.getenv('ARTIFACTORY_PASSWORD')
             }
         }
     }
