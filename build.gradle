@@ -28,6 +28,7 @@ bootJar {
 }
 
 jar {
+    enabled true
     archiveName "${project.name}.jar"
     archiveClassifier.set("")
 }
