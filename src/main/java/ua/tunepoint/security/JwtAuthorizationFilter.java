@@ -25,7 +25,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final Algorithm algorithm;
 
     public JwtAuthorizationFilter(SecurityProperties properties) {
-        this.algorithm = Algorithm.HMAC256(properties.getSecret().getBytes());
+        this.algorithm = AlgorithmProvider.get(properties.getSecret());
     }
 
     @Override
