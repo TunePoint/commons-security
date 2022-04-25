@@ -3,6 +3,8 @@ package ua.tunepoint.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+@Slf4j
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private static final String BEARER = "Bearer ";
@@ -33,22 +36,28 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         JwtContext.clear();
 
-        var authorizationHeader = request.getHeader(AUTHORIZATION);
-        if (StringUtils.hasText(authorizationHeader) && authorizationHeader.startsWith(BEARER)) {
-            String token = extractToken(authorizationHeader);
+        try {
+            var authorizationHeader = request.getHeader(AUTHORIZATION);
+            if (StringUtils.hasText(authorizationHeader) && authorizationHeader.startsWith(BEARER)) {
+                String token = extractToken(authorizationHeader);
 
-            var verifier = JWT.require(algorithm).build();
+                var verifier = JWT.require(algorithm).build();
 
-            var principal = decode(verifier.verify(token));
+                var principal = decode(verifier.verify(token));
 
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, principal.getUsername(), principal.getAuthorities());
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, principal.getUsername(), principal.getAuthorities());
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
+                SecurityContextHolder.getContext().setAuthentication(auth);
 
-            JwtContext.setHeader(authorizationHeader);
+                JwtContext.setHeader(authorizationHeader);
+            }
+
+            filterChain.doFilter(request, response);
+        } catch (Exception ex) {
+            log.error("Error occurred while authenticating user", ex);
+
+            response.sendError(HttpStatus.UNAUTHORIZED.value());
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private UserPrincipal decode(DecodedJWT jwt) {
