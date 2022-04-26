@@ -6,4 +6,5 @@ import lombok.experimental.UtilityClass;
 public class UserContextHeaders {
 
     public static final String USER_CONTEXT = "X-User-Context";
+    public static final String REQUEST_CORRELATION_ID = "X-Correlation-Id";
 }
